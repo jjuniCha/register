@@ -82,6 +82,44 @@
             color: white;
         }
 
+        .login-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .login-form {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2E7D32;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ff;
+            border-radius: 8px;
+            font-size: 1.1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
         .score-board {
             background: linear-gradient(45deg, #4CAF50, #2E7D32);
             color: white;
@@ -89,6 +127,15 @@
             border-radius: 15px;
             margin-bottom: 30px;
             font-size: 1.1em;
+        }
+
+        .user-info {
+            background: #e8f5e8;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #2E7D32;
         }
 
         .difficulty-indicator {
@@ -247,6 +294,59 @@
             border-bottom: 1px solid #e1e8ff;
         }
 
+        .ranking-container {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .ranking-item.current-user {
+            background: linear-gradient(45deg, #4CAF50, #2E7D32);
+            color: white;
+            font-weight: bold;
+        }
+
+        .rank-position {
+            font-size: 1.2em;
+            font-weight: bold;
+            min-width: 40px;
+        }
+
+        .rank-info {
+            flex-grow: 1;
+            text-align: left;
+            margin-left: 15px;
+        }
+
+        .rank-name {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .rank-student-id {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .rank-score {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
         .hidden {
             display: none;
         }
@@ -271,91 +371,131 @@
             background: #f44336;
             color: white;
         }
+
+        .medal {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="quiz-container">
         <h1>🧠 고등학생 상식 퀴즈</h1>
         
-        <div class="tabs">
-            <button class="tab active" onclick="showTab('quiz')">퀴즈</button>
-            <button class="tab" onclick="showTab('stats')">통계</button>
+        <div id="login-screen">
+            <div class="login-container">
+                <h2>퀴즈 시작하기</h2>
+                <div class="login-form">
+                    <div class="input-group">
+                        <label for="student-name">이름</label>
+                        <input type="text" id="student-name" placeholder="이름을 입력하세요" maxlength="20">
+                    </div>
+                    <div class="input-group">
+                        <label for="student-id">학번</label>
+                        <input type="text" id="student-id" placeholder="학번을 입력하세요" maxlength="10">
+                    </div>
+                    <button class="btn" onclick="startQuizWithInfo()">퀴즈 시작!</button>
+                </div>
+            </div>
         </div>
         
-        <div id="quiz-tab">
-            <div id="quiz-screen">
-                <div class="score-board">
-                    <div>문제: <span id="current-question">1</span> / <span id="total-questions">10</span></div>
-                    <div>점수: <span id="current-score">0</span>점</div>
-                </div>
-                
-                <div class="progress-bar">
-                    <div class="progress" id="progress"></div>
-                </div>
-                
-                <div class="question-container">
-                    <div class="difficulty-indicator" id="difficulty-indicator"></div>
-                    <div class="question" id="question-text"></div>
-                    <div class="options" id="options-container"></div>
-                </div>
-                
-                <button class="btn" id="next-btn" onclick="nextQuestion()" disabled>다음 문제</button>
+        <div id="main-content" class="hidden">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('quiz')">퀴즈</button>
+                <button class="tab" onclick="showTab('ranking')">순위</button>
+                <button class="tab" onclick="showTab('stats')">통계</button>
             </div>
             
-            <div id="result-screen" class="hidden">
-                <div class="result-container">
-                    <div class="result-title">🎉 퀴즈 완료!</div>
-                    <div class="final-score" id="final-score">0점</div>
-                    <div class="result-message" id="result-message"></div>
-                    <div class="stats-container">
-                        <div class="stats-title">이번 게임 결과</div>
-                        <div class="stat-item">
-                            <span>맞힌 문제</span>
-                            <span id="correct-count">0 / 10</span>
+            <div id="quiz-tab">
+                <div id="quiz-screen">
+                    <div class="user-info">
+                        <span id="user-display"></span>
+                    </div>
+                    <div class="score-board">
+                        <div>문제: <span id="current-question">1</span> / <span id="total-questions">10</span></div>
+                        <div>점수: <span id="current-score">0</span>점</div>
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                    
+                    <div class="question-container">
+                        <div class="difficulty-indicator" id="difficulty-indicator"></div>
+                        <div class="question" id="question-text"></div>
+                        <div class="options" id="options-container"></div>
+                    </div>
+                    
+                    <button class="btn" id="next-btn" onclick="nextQuestion()" disabled>다음 문제</button>
+                </div>
+                
+                <div id="result-screen" class="hidden">
+                    <div class="result-container">
+                        <div class="result-title">🎉 퀴즈 완료!</div>
+                        <div class="final-score" id="final-score">0점</div>
+                        <div class="result-message" id="result-message"></div>
+                        <div class="stats-container">
+                            <div class="stats-title">이번 게임 결과</div>
+                            <div class="stat-item">
+                                <span>맞힌 문제</span>
+                                <span id="correct-count">0 / 10</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>쉬운 문제 정답률</span>
+                                <span id="easy-correct">0 / 8</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>어려운 문제 정답률</span>
+                                <span id="hard-correct">0 / 2</span>
+                            </div>
                         </div>
-                        <div class="stat-item">
-                            <span>쉬운 문제 정답률</span>
-                            <span id="easy-correct">0 / 8</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>어려운 문제 정답률</span>
-                            <span id="hard-correct">0 / 2</span>
+                        <button class="btn" onclick="showTab('ranking')">순위 보기</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="ranking-tab" class="hidden">
+                <div class="stats-container">
+                    <div class="stats-title">🏆 실시간 순위</div>
+                    <div class="ranking-container" id="ranking-list">
+                        <div style="text-align: center; color: #666; padding: 20px;">
+                            순위 데이터를 불러오는 중...
                         </div>
                     </div>
-                    <button class="btn" onclick="showTab('stats')">통계 보기</button>
                 </div>
+                <button class="btn" onclick="refreshRanking()">순위 새로고침</button>
             </div>
-        </div>
-        
-        <div id="stats-tab" class="hidden">
-            <div class="stats-container">
-                <div class="stats-title">📊 전체 통계</div>
-                <div class="stat-item">
-                    <span>총 플레이 횟수</span>
-                    <span id="total-games">0회</span>
+            
+            <div id="stats-tab" class="hidden">
+                <div class="stats-container">
+                    <div class="stats-title">📊 전체 통계</div>
+                    <div class="stat-item">
+                        <span>총 플레이 횟수</span>
+                        <span id="total-games">0회</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>최고 점수</span>
+                        <span id="best-score">0점</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>평균 점수</span>
+                        <span id="avg-score">0점</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>전체 정답률</span>
+                        <span id="total-accuracy">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>쉬운 문제 정답률</span>
+                        <span id="easy-accuracy">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>어려운 문제 정답률</span>
+                        <span id="hard-accuracy">0%</span>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <span>최고 점수</span>
-                    <span id="best-score">0점</span>
-                </div>
-                <div class="stat-item">
-                    <span>평균 점수</span>
-                    <span id="avg-score">0점</span>
-                </div>
-                <div class="stat-item">
-                    <span>전체 정답률</span>
-                    <span id="total-accuracy">0%</span>
-                </div>
-                <div class="stat-item">
-                    <span>쉬운 문제 정답률</span>
-                    <span id="easy-accuracy">0%</span>
-                </div>
-                <div class="stat-item">
-                    <span>어려운 문제 정답률</span>
-                    <span id="hard-accuracy">0%</span>
-                </div>
+                <button class="btn" onclick="resetStats()">통계 초기화</button>
             </div>
-            <button class="btn" onclick="resetStats()">통계 초기화</button>
         </div>
     </div>
 
@@ -428,6 +568,7 @@
         let currentQuestion = 0;
         let score = 0;
         let selectedAnswer = null;
+        let currentUser = { name: '', studentId: '' };
         let gameData = {
             correctAnswers: 0,
             easyCorrect: 0,
@@ -448,14 +589,37 @@
             hardCorrect: 0
         };
 
+        // 순위 데이터 (GitHub에서 불러올 예정)
+        let rankingData = [];
+
+        function startQuizWithInfo() {
+            const name = document.getElementById('student-name').value.trim();
+            const studentId = document.getElementById('student-id').value.trim();
+            
+            if (!name || !studentId) {
+                alert('이름과 학번을 모두 입력해주세요!');
+                return;
+            }
+            
+            currentUser = { name, studentId };
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-content').classList.remove('hidden');
+            document.getElementById('user-display').textContent = `${name} (${studentId})`;
+            
+            startQuiz();
+        }
+
         function showTab(tabName) {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
             
             document.getElementById('quiz-tab').classList.toggle('hidden', tabName !== 'quiz');
+            document.getElementById('ranking-tab').classList.toggle('hidden', tabName !== 'ranking');
             document.getElementById('stats-tab').classList.toggle('hidden', tabName !== 'stats');
             
-            if (tabName === 'stats') {
+            if (tabName === 'ranking') {
+                loadRankingData();
+            } else if (tabName === 'stats') {
                 updateStatsDisplay();
             }
         }
@@ -631,6 +795,8 @@
         async function saveToGitHub() {
             const gameResult = {
                 timestamp: new Date().toISOString(),
+                name: currentUser.name,
+                studentId: currentUser.studentId,
                 score: score,
                 totalQuestions: questions.length,
                 correctAnswers: gameData.correctAnswers,
@@ -655,7 +821,7 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        message: `퀴즈 결과 저장: ${gameResult.score}점`,
+                        message: `퀴즈 결과 저장: ${gameResult.name}(${gameResult.studentId}) - ${gameResult.score}점`,
                         content: btoa(unescape(encodeURIComponent(JSON.stringify(gameResult, null, 2)))),
                         branch: 'main'
                     })
@@ -674,62 +840,12 @@
             }
         }
 
-        function generateSessionId() {
-            return 'quiz-' + Math.random().toString(36).substr(2, 9);
-        }
-
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.innerHTML = message;
-            notification.className = `notification ${type}`;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, type === 'error' ? 5000 : 3000);
-        }
-
-        function updateStatsDisplay() {
-            document.getElementById('total-games').textContent = `${gameStats.totalGames}회`;
-            document.getElementById('best-score').textContent = `${gameStats.bestScore}점`;
-            
-            const avgScore = gameStats.totalGames > 0 ? Math.round(gameStats.totalScore / gameStats.totalGames) : 0;
-            document.getElementById('avg-score').textContent = `${avgScore}점`;
-            
-            const totalAccuracy = gameStats.totalQuestions > 0 ? Math.round((gameStats.totalCorrect / gameStats.totalQuestions) * 100) : 0;
-            document.getElementById('total-accuracy').textContent = `${totalAccuracy}%`;
-            
-            const easyAccuracy = gameStats.easyTotal > 0 ? Math.round((gameStats.easyCorrect / gameStats.easyTotal) * 100) : 0;
-            document.getElementById('easy-accuracy').textContent = `${easyAccuracy}%`;
-            
-            const hardAccuracy = gameStats.hardTotal > 0 ? Math.round((gameStats.hardCorrect / gameStats.hardTotal) * 100) : 0;
-            document.getElementById('hard-accuracy').textContent = `${hardAccuracy}%`;
-        }
-
-        function resetStats() {
-            if (confirm('정말로 모든 통계를 초기화하시겠습니까?')) {
-                gameStats = {
-                    totalGames: 0,
-                    bestScore: 0,
-                    totalScore: 0,
-                    totalQuestions: 0,
-                    totalCorrect: 0,
-                    easyTotal: 0,
-                    easyCorrect: 0,
-                    hardTotal: 0,
-                    hardCorrect: 0
-                };
-                updateStatsDisplay();
-            }
-        }
-
-        // 페이지 새로고침 시 새 퀴즈 시작
-        window.addEventListener('beforeunload', function() {
-            // 현재 진행 중인 퀴즈가 있다면 자동 저장 (선택사항)
-        });
-
-        // 퀴즈 시작
-        startQuiz();
-    </script>
-</body>
-</html>
+        async function loadRankingData() {
+            try {
+                // GitHub에서 순위 데이터 불러오기 (실제 사용시 구현 필요)
+                // 현재는 데모 데이터로 표시
+                const demoRanking = [
+                    { name: '김철수', studentId: '20240101', score: 145, timestamp: '2025-08-27T10:00:00Z' },
+                    { name: '이영희', studentId: '20240102', score: 135, timestamp: '2025-08-27T10:05:00Z' },
+                    { name: '박민수', studentId: '20240103', score: 125, timestamp: '2025-08-27T10:10:00Z' },
+                    { name: '정지은', studentId: '20240104', score:
